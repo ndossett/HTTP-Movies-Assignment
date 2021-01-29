@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useHistory } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import axios from 'axios'
 
 const initialMovie = {
     id: '',
@@ -10,56 +10,38 @@ const initialMovie = {
     stars: [],
 }
 
-const UpdateForm = props => {
+const AddForm = ({getMovieList}) => {
+    const [formValues, setFormValues] = useState(initialMovie);
     const { push } = useHistory();
-    const [formValues, setFormValues] = useState(initialMovie)
-    const { id } = useParams();
 
-    useEffect(() => {
-        axios
-        .get(`http://localhost:5000/api/movies/${id}`)
-        .then(res => {
-            console.log(res.data)
-            setFormValues(res.data);
-        })
-        .catch(err => {
-            console.log(err);
-        });
-    }, []);
-
-    const changeMovieHandler = evt => {
+    const changeHandler = evt => {
         const { name, value } = evt.target
-        setFormValues({...formValues, [name]: value});
-    };
+        setFormValues({...formValues, [name]: value})
+    }
 
-    const handleMovieSubmit = e => {
+   const handleSubmit = e => {
         e.preventDefault();
         axios
-        .put(`http://localhost:5000/api/movies/${id}`, formValues)
+        .post(`http://localhost:5000/api/movies/`, formValues)
         .then(res => {
-            setFormValues(props.movieList.map(movie => {
-                if(movie.id === res.data.id){
-                    return  res.data;
-                } else {
-                    return movie;
-                }
-            }));
-            push(`/movies/${id}`);
+            setFormValues(initialMovie);
+            getMovieList();
+            push('/');
         })
         .catch(err => {
-            console.log(err);
-        });
+            console.log(err)
+        })
     };
 
     return (
         <div>
-            <h2> Update Movie</h2>
-            <form onSubmit={handleMovieSubmit}>
+            <h2> Add Movie</h2>
+            <form onSubmit={handleSubmit}>
                 <label htmlFor='title'>Title</label>
                 <input 
                     type='text'
                     name='title'
-                    onChange={changeMovieHandler}
+                    onChange={changeHandler}
                     placeholder='title'
                     value={formValues.title}
                 />
@@ -67,7 +49,7 @@ const UpdateForm = props => {
                 <input 
                     type='text'
                     name='director'
-                    onChange={changeMovieHandler}
+                    onChange={changeHandler}
                     placeholder='director'
                     value={formValues.director}
                 />
@@ -75,7 +57,7 @@ const UpdateForm = props => {
                 <input 
                     type='number'
                     name='metascore'
-                    onChange={changeMovieHandler}
+                    onChange={changeHandler}
                     placeholder='metascore'
                     value={formValues.metascore}
                 />
@@ -83,7 +65,7 @@ const UpdateForm = props => {
                 <input 
                     type='string'
                     name='actors'
-                    onChange={changeMovieHandler}
+                    onChange={changeHandler}
                     placeholder='actors'
                     value={formValues.actors}
                 />
@@ -93,4 +75,4 @@ const UpdateForm = props => {
     )
 }
 
-export default UpdateForm
+export default AddForm
